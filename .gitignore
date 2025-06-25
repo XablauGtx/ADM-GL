@@ -1,0 +1,16 @@
+# Ficheiro de credenciais do Firebase - NUNCA ENVIAR!
+firebase-credentials.json
+
+# Ficheiros e pastas de cache do Python
+__pycache__/
+*.pyc
+
+# Pastas de ambientes virtuais
+venv/
+.venv/
+env/
+.env
+
+# Ficheiros de configuração de editores de código (opcional, mas boa prática)
+.vscode/
+.idea/
