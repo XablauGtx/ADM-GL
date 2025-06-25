@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}Meus Contratos{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Meus Contratos</h1>
+    <p>Visualize e gerencie todos os contratos gerados.</p>
+</header>
+
+<!-- Formulário de Busca (NOVO) -->
+<div class="search-container">
+    <form method="GET" action="{{ url_for('contratos_page') }}">
+        <div class="search-box">
+            <i data-feather="search"></i>
+            <!-- O 'value' garante que o termo buscado permaneça no campo -->
+            <input type="text" name="busca" placeholder="Buscar por nome exato do cliente..." value="{{ termo_busca or '' }}">
+        </div>
+        <button type="submit" class="btn-buscar">Buscar</button>
+        <!-- Mostra o botão 'Limpar' apenas se uma busca foi feita -->
+        {% if termo_busca %}
+        <a href="{{ url_for('contratos_page') }}" class="btn-limpar">Limpar Busca</a>
+        {% endif %}
+    </form>
+</div>
+
+
+<!-- Mensagens de Alerta (Flash Messages) -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contrato in contratos %}
+            <tr>
+                <td>{{ contrato.nome_cliente }}</td>
+                <td>{{ contrato.servico | truncate(50) }}</td>
+                <td>R$ {{ "%.2f"|format(contrato.valor_total) }}</td>
+                <td>{{ contrato.data_criacao_fmt }}</td>
+                <td class="actions-cell">
+                    <a href="{{ url_for('editar_contrato', contract_id=contrato.id) }}" class="action-btn edit">
+                        <i data-feather="edit-2"></i> Editar
+                    </a>
+                    
+                    <a href="{{ url_for('download_contract', contract_id=contrato.id) }}" class="action-btn download">
+                        <i data-feather="download"></i> Download
+                    </a>
+                    
+                    <form method="POST" action="{{ url_for('excluir_contrato', contract_id=contrato.id) }}" onsubmit="return confirm('Tem certeza que deseja excluir este contrato?');">
+                        <button type="submit" class="action-btn delete">
+                            <i data-feather="trash-2"></i> Excluir
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">Nenhum contrato encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

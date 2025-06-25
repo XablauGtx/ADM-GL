@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+{% block title %}Nova Ordem de Serviço{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Nova Ordem de Serviço</h1>
+    <p>Preencha todos os campos para registrar um novo serviço.</p>
+</header>
+
+<div class="form-container">
+    <form method="POST">
+        <!-- DADOS DO CLIENTE -->
+        <h3 class="form-title">Dados do Cliente</h3>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Selecionar Cliente</label>
+                <select id="cliente_selecionado" onchange="preencherDadosCliente()">
+                    <option value="">-- Selecione um cliente existente --</option>
+                    {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" name="cliente_nome" id="cliente_nome" required>
+            </div>
+            <div class="form-group">
+                <label>CPF/CNPJ</label>
+                <input type="text" name="cliente_doc" id="cliente_doc">
+            </div>
+            <div class="form-group">
+                <label>Endereço</label>
+                <input type="text" name="cliente_endereco" id="cliente_endereco">
+            </div>
+            <div class="form-group">
+                <label>Cidade</label>
+                <input type="text" name="cliente_cidade" id="cliente_cidade">
+            </div>
+            <div class="form-group">
+                <label>Telefone</label>
+                <input type="text" name="cliente_telefone" id="cliente_telefone">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" name="cliente_email" id="cliente_email">
+            </div>
+        </div>
+
+        <!-- O resto do formulário (INFORMAÇÕES DO SERVIÇO, ORÇAMENTO) continua o mesmo -->
+        <h3 class="form-title" style="margin-top: 2rem;">Informações do Serviço</h3>
+        <div class="form-grid full-width">
+            <div class="form-group full-width">
+                <label>Título do Serviço</label>
+                <input type="text" name="servico_titulo" required>
+            </div>
+             <div class="form-group full-width">
+                <label>Detalhes do Projeto</label>
+                <textarea name="servico_detalhes" rows="3"></textarea>
+            </div>
+            <div class="form-group full-width">
+                <label>Escopo e Entregáveis</label>
+                <textarea name="servico_escopo" rows="4"></textarea>
+            </div>
+             <div class="form-group full-width">
+                <label>Garantia e Observações</label>
+                <textarea name="servico_garantia" rows="2"></textarea>
+            </div>
+        </div>
+        <h3 class="form-title" style="margin-top: 2rem;">Orçamento</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Valor dos Serviços (R$)</label>
+                <input type="number" step="0.01" name="orcamento_servicos" value="0.00" required>
+            </div>
+            <div class="form-group">
+                <label>Valor de Produtos/Plugins (R$)</label>
+                <input type="number" step="0.01" name="orcamento_produtos" value="0.00" required>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn-salvar" style="width: 100%; margin-top: 2rem;">
+            <i data-feather="save"></i>
+            Registrar Ordem de Serviço
+        </button>
+    </form>
+</div>
+
+<script>
+    const clientes = JSON.parse('{{ clientes_json | safe }}');
+    
+    function preencherDadosCliente() {
+        const selectedId = document.getElementById('cliente_selecionado').value;
+        const cliente = clientes.find(c => c.id === selectedId);
+
+        if (cliente) {
+            document.getElementById('cliente_nome').value = cliente.nome || '';
+            document.getElementById('cliente_doc').value = cliente.doc || '';
+            document.getElementById('cliente_endereco').value = cliente.endereco || '';
+            document.getElementById('cliente_cidade').value = cliente.cidade || '';
+            document.getElementById('cliente_telefone').value = cliente.telefone || '';
+            document.getElementById('cliente_email').value = cliente.email || '';
+        } else {
+            // Limpa os campos se "Selecione um cliente" for escolhido
+            document.getElementById('cliente_nome').value = '';
+            document.getElementById('cliente_doc').value = '';
+            document.getElementById('cliente_endereco').value = '';
+            document.getElementById('cliente_cidade').value = '';
+            document.getElementById('cliente_telefone').value = '';
+            document.getElementById('cliente_email').value = '';
+        }
+    }
+</script>
+{% endblock %}

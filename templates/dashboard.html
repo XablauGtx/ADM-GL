@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Dashboard</h1>
+    <p>Visão geral da sua atividade.</p>
+</header>
+
+<!-- Grid de Estatísticas Atualizado -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="card-icon purple">
+            <i data-feather="clipboard"></i>
+        </div>
+        <div class="card-info">
+            <h4>O.S. (Total)</h4>
+            <p>{{ stats.total_os }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon green">
+            <i data-feather="dollar-sign"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor Gerado (Total)</h4>
+            <p>R$ {{ "%.2f"|format(stats.valor_total_gerado) }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon blue">
+            <i data-feather="calendar"></i>
+        </div>
+        <div class="card-info">
+            <h4>O.S. (Mês Atual)</h4>
+            <p>{{ stats.os_este_mes }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon orange">
+            <i data-feather="trending-up"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor (Mês Atual)</h4>
+            <p>R$ {{ "%.2f"|format(stats.valor_este_mes) }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Seção de OS Recentes -->
+<div class="recent-contracts-container">
+    <div class="recent-header">
+        <h2>Ordens de Serviço Recentes</h2>
+        <a href="{{ url_for('ordens_servico_page') }}" class="view-all-btn">Ver Todas</a>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Serviço</th>
+                    <th>Valor Total</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for os in ordens_servico %}
+                <tr>
+                    <td>{{ os.cliente_nome }}</td>
+                    <td>{{ os.servico_titulo | truncate(40) }}</td>
+                    <td>R$ {{ "%.2f"|format(os.orcamento_servicos + os.orcamento_produtos) }}</td>
+                    <td>{{ os.data_abertura_fmt }}</td>
+                    <td>
+                        <a href="{{ url_for('visualizar_os_page', os_id=os.id) }}" class="action-btn-sm view">
+                            <i data-feather="eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">Nenhuma Ordem de Serviço recente encontrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

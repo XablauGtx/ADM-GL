@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Gerar Novo Contrato{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Gerador de Contrato</h1>
+    <p>Preencha os campos abaixo para criar um novo contrato de serviço.</p>
+</header>
+
+<div class="form-container">
+    <form method="POST">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="nome_cliente">Nome Completo do Cliente:</label>
+                <input type="text" id="nome_cliente" name="nome_cliente" placeholder="Ex: Maria da Silva" required>
+            </div>
+            <div class="form-group">
+                <label for="doc_cliente">CPF ou CNPJ do Cliente:</label>
+                <input type="text" id="doc_cliente" name="doc_cliente" placeholder="Ex: 123.456.789-00" required>
+            </div>
+            <div class="form-group full-width">
+                <label for="servico">Descrição do Serviço:</label>
+                <input type="text" id="servico" name="servico" placeholder="Ex: Desenvolvimento de um site institucional" required>
+            </div>
+            <div class="form-group">
+                <label for="valor_total">Valor Total (R$):</label>
+                <input type="number" id="valor_total" name="valor_total" step="0.01" min="0" placeholder="Ex: 1500.00" required>
+            </div>
+            <div class="form-group">
+                <label for="prazo_dias">Prazo (em dias úteis):</label>
+                <input type="number" id="prazo_dias" name="prazo_dias" min="1" placeholder="Ex: 20" required>
+            </div>
+        </div>
+        <button type="submit">
+            <i data-feather="save"></i>
+            Salvar Contrato
+        </button>
+    </form>
+</div>
+{% endblock %}

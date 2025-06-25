@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}Editar Contrato{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Editar Contrato</h1>
+    <p>Altere as informações abaixo e salve as modificações.</p>
+</header>
+
+<div class="form-container">
+    <form method="POST" action="{{ url_for('editar_contrato', contract_id=contract_id) }}">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="nome_cliente">Nome Completo do Cliente:</label>
+                <input type="text" id="nome_cliente" name="nome_cliente" value="{{ contrato.nome_cliente }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="doc_cliente">CPF ou CNPJ do Cliente:</label>
+                <input type="text" id="doc_cliente" name="doc_cliente" value="{{ contrato.doc_cliente }}" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="servico">Descrição do Serviço:</label>
+                <input type="text" id="servico" name="servico" value="{{ contrato.servico }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="valor_total">Valor Total (R$):</label>
+                <input type="number" id="valor_total" name="valor_total" step="0.01" min="0" value="{{ contrato.valor_total }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="prazo_dias">Prazo (em dias úteis):</label>
+                <input type="number" id="prazo_dias" name="prazo_dias" min="1" value="{{ contrato.prazo_dias }}" required>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{{ url_for('contratos_page') }}" class="btn-cancelar">Cancelar</a>
+            <button type="submit" class="btn-salvar">
+                <i data-feather="save"></i>
+                Salvar Alterações
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>OS {{ os.id[:8] }} - {{ os.cliente_nome }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='os_style.css') }}">
+</head>
+<body>
+    <div class="os-container">
+        <header class="os-header">
+            <div class="company-info">
+                <h1>{{ empresa.nome_empresa or 'Sua Empresa' }}</h1>
+                <p>CNPJ: {{ empresa.cnpj or 'Não configurado' }}</p>
+            </div>
+            <div class="os-details-box">
+                <h2>REGISTRO DE ORDEM DE SERVIÇO</h2>
+                <p><strong>O.S. Nº:</strong> {{ os.id[:8] }}</p>
+                <p><strong>Data de abertura:</strong> {{ os.data_abertura_fmt }}</p>
+            </div>
+        </header>
+
+        <section class="os-section">
+            <h3 class="section-title">DADOS DO CLIENTE</h3>
+            <table class="info-table">
+                <tr>
+                    <td><strong>Nome:</strong> {{ os.cliente_nome }}</td>
+                    <td><strong>CPF/CNPJ:</strong> {{ os.cliente_doc }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Endereço:</strong> {{ os.cliente_endereco }}</td>
+                    <td><strong>Cidade:</strong> {{ os.cliente_cidade }}</td>
+                </tr>
+                 <tr>
+                    <td><strong>Telefone:</strong> {{ os.cliente_telefone }}</td>
+                    <td><strong>E-mail:</strong> {{ os.cliente_email }}</td>
+                </tr>
+            </table>
+        </section>
+        
+        <section class="os-section">
+            <h3 class="section-title">DETALHES DO PROJETO (REQUISITOS DO CLIENTE)</h3>
+            <p>{{ os.servico_detalhes | replace('\n', '<br>') | safe }}</p>
+        </section>
+
+        <section class="os-section">
+            <h3 class="section-title">ESCOPO E SERVIÇO A SER PRESTADO</h3>
+            <p>{{ os.servico_escopo | replace('\n', '<br>') | safe }}</p>
+        </section>
+
+        <section class="os-section">
+            <h3 class="section-title">GARANTIA E OBSERVAÇÕES</h3>
+            <p>{{ os.servico_garantia or 'Nenhuma observação.' }}</p>
+        </section>
+
+        <section class="os-section">
+            <h3 class="section-title">ORÇAMENTO</h3>
+            <table class="budget-table">
+                <tr>
+                    <td>Valor dos serviços:</td>
+                    <td>R$ {{ "%.2f"|format(os.orcamento_servicos) }}</td>
+                </tr>
+                <tr>
+                    <td>Valor de peças/produtos:</td>
+                    <td>R$ {{ "%.2f"|format(os.orcamento_produtos) }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>Valor total:</strong></td>
+                    <td><strong>R$ {{ "%.2f"|format(os.orcamento_servicos + os.orcamento_produtos) }}</strong></td>
+                </tr>
+            </table>
+        </section>
+
+        <footer class="os-footer">
+            <div class="signature-line">
+                <p>___________________________________</p>
+                <p>Assinatura Cliente</p>
+            </div>
+            <div class="signature-line">
+                <p>___________________________________</p>
+                <p>{{ empresa.nome_empresa or 'Sua Empresa' }}</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

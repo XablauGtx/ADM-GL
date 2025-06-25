@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}Ordens de Serviço{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Ordens de Serviço</h1>
+    <p>Visualize e gerencie todas as O.S. registradas.</p>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>O.S. #</th>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for os in lista_os %}
+            <tr>
+                <td>{{ os.id[:8] }}...</td>
+                <td>{{ os.data_abertura_fmt }}</td>
+                <td>{{ os.cliente_nome }}</td>
+                <td>{{ os.servico_titulo | truncate(40) }}</td>
+                <td>
+                    <form class="status-form" method="POST" action="{{ url_for('atualizar_status_os', os_id=os.id) }}">
+                        <select name="novo_status" class="status-select status-{{ os.status | lower }}" onchange="this.form.submit()">
+                            <option value="Aberta" {% if os.status == 'Aberta' %}selected{% endif %}>Aberta</option>
+                            <option value="Em Andamento" {% if os.status == 'Em Andamento' %}selected{% endif %}>Em Andamento</option>
+                            <option value="Concluída" {% if os.status == 'Concluída' %}selected{% endif %}>Concluída</option>
+                            <option value="Cancelada" {% if os.status == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+                        </select>
+                    </form>
+                </td>                
+                <td>
+                    <a href="{{ url_for('visualizar_os_page', os_id=os.id) }}" class="action-btn view">
+                        <i data-feather="eye"></i> Visualizar
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">Nenhuma Ordem de Serviço encontrada.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

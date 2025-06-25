@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - GL Technology</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i data-feather="hexagon"></i>
+                <h2>GL Technology</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="{{ 'active' if active_page == 'dashboard' else '' }}">
+                        <a href="{{ url_for('dashboard') }}"><i data-feather="home"></i><span>Dashboard</span></a>
+                    </li>
+                    <li class="{{ 'active' if active_page == 'clientes' else '' }}">
+                        <a href="{{ url_for('clientes_page') }}"><i data-feather="users"></i><span>Clientes</span></a>
+                    </li>
+                    <li class="{{ 'active' if active_page == 'gerar_os' else '' }}">
+                        <a href="{{ url_for('gerar_os_page') }}"><i data-feather="file-plus"></i><span>Nova O.S.</span></a>
+                    </li>
+                    <li class="{{ 'active' if active_page == 'ordens_servico' else '' }}">
+                        <a href="{{ url_for('ordens_servico_page') }}"><i data-feather="clipboard"></i><span>Ordens de Serviço</span></a>
+                    </li>
+                    <li class="{{ 'active' if active_page == 'configuracoes' else '' }}">
+                        <a href="{{ url_for('configuracoes_page') }}"><i data-feather="settings"></i><span>Configurações</span></a>
+                    </li>
+                </ul>
+                <ul>
+                </ul>
+            <ul style="margin-top: auto;">
+               <li>
+                   <a href="{{ url_for('logout') }}"><i data-feather="log-out"></i><span>Sair</span></a>
+               </li>
+            </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <img src="https://i.imgur.com/T0f4Jxe.png" alt="Illustration">
+                <h4>Área Segura</h4>
+                <p>Seus dados estão protegidos.</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+      feather.replace()
+    </script>
+</body>
+</html>

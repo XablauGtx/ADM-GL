@@ -1,0 +1,194 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #EFEFEF;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+.os-container {
+    max-width: 800px;
+    margin: auto;
+    background-color: #FFF;
+    padding: 40px;
+    border: 1px solid #DDD;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.os-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #333;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.company-info h1 {
+    margin: 0;
+    font-size: 24px;
+}
+.company-info p {
+    margin: 2px 0 0;
+    font-size: 14px;
+}
+.os-details-box {
+    border: 1px solid #CCC;
+    padding: 10px;
+    text-align: center;
+}
+.os-details-box h2 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    background-color: #EFEFEF;
+    padding: 5px;
+}
+.os-details-box p {
+    margin: 0;
+    font-size: 14px;
+}
+.os-section {
+    border: 1px solid #CCC;
+    margin-top: 20px;
+}
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    background-color: #EFEFEF;
+    margin: 0;
+    padding: 8px;
+    border-bottom: 1px solid #CCC;
+}
+.os-section p {
+    padding: 15px;
+    margin: 0;
+    line-height: 1.6;
+}
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.info-table td {
+    padding: 8px 15px;
+    font-size: 14px;
+}
+.budget-table {
+    width: auto;
+    margin-left: auto;
+    margin-right: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.budget-table td {
+    padding: 5px 10px;
+    text-align: right;
+}
+.total-row {
+    border-top: 1px solid #CCC;
+    font-size: 18px;
+}
+.os-footer {
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    font-size: 14px;
+}
+.signature-line p {
+    margin: 0;
+}
+/* Estilos para o formulário e seletor de status */
+.status-form {
+    margin: 0;
+}
+.status-select {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none; /* Remove a seta padrão */
+}
+.status-select:focus {
+    outline: none;
+}
+
+/* Cores do seletor baseadas na classe da opção selecionada */
+.status-select.status-aberta { background-color: #007BFF; }
+.status-select.status-em\ andamento { background-color: #FF9F43; } /* CSS não gosta de espaços */
+.status-select.status-concluída { background-color: #28C76F; }
+.status-select.status-cancelada { background-color: #FF4D4D; }
+
+/* Nova cor de status para 'Em Andamento' */
+.status-badge.status-em\ andamento { background-color: #FF9F43; }
+/* Adicionar ao final de static/style.css */
+
+/* --- Estilos para Modal de Cliente --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5); 
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 10vh auto; 
+    padding: 2rem;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-button:hover, .close-button:focus {
+    color: black;
+}
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* Estilo para Select */
+select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    background-color: var(--color-white);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}

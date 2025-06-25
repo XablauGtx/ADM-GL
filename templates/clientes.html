@@ -1,0 +1,229 @@
+{% extends "layout.html" %}
+
+{% block title %}Carteira de Clientes{% endblock %}
+
+{% block content %}
+<!-- Adicionando os estilos do Modal e dos botões para garantir que funcionem -->
+<style>
+    /* Estilos do Modal */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        overflow: auto; 
+        background-color: rgba(0,0,0,0.5); 
+        animation: fadeIn 0.3s;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10vh auto; 
+        padding: 2rem;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 700px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    .close-button {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close-button:hover, .close-button:focus {
+        color: black;
+    }
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(-20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* Estilos para o Botão "Adicionar Cliente" (CORRIGIDO) */
+    .view-all-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        cursor: pointer;
+    }
+    
+    /* Estilos para os botões de Ação na tabela (CORRIGIDO) */
+    .actions-cell .action-btn-sm {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+    }
+    .actions-cell .action-btn-sm i {
+        width: 16px;
+        height: 16px;
+    }
+</style>
+
+<header class="main-header">
+    <h1>Carteira de Clientes</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <p>Gerencie todos os seus clientes em um único lugar.</p>
+        <button class="view-all-btn" onclick="openModal()">
+            <i data-feather="plus"></i> Adicionar Cliente
+        </button>
+    </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th style="width: 150px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nome }}</td>
+                <td>{{ cliente.email }}</td>
+                <td>{{ cliente.telefone }}</td>
+                <td class="actions-cell">
+                    <button class="action-btn-sm edit" 
+                            data-cliente='{{ cliente | tojson | safe }}' 
+                            onclick="openModal(this)">
+                        <i data-feather="edit-2"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for('excluir_cliente', cliente_id=cliente.id) }}" onsubmit="return confirm('Tem certeza que deseja excluir este cliente?');">
+                        <button type="submit" class="action-btn-sm delete">
+                            <i data-feather="trash-2"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">Nenhum cliente cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Adicionar/Editar Cliente -->
+<div id="client-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Adicionar Novo Cliente</h3>
+            <span class="close-button" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="client-form" method="POST">
+                <input type="hidden" name="cliente_id" id="cliente_id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF/CNPJ</label>
+                        <input type="text" name="doc" id="doc">
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <input type="text" name="endereco" id="endereco">
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" name="cidade" id="cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" name="telefone" id="telefone">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" name="email" id="email">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancelar" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('client-modal');
+    const form = document.getElementById('client-form');
+    const modalTitle = document.getElementById('modal-title');
+
+    function openModal(buttonElement = null) {
+        form.reset();
+        
+        if (buttonElement && buttonElement.dataset.cliente) {
+            const cliente = JSON.parse(buttonElement.dataset.cliente);
+            
+            modalTitle.textContent = 'Editar Cliente';
+            form.action = `/editar_cliente/${cliente.id}`;
+            document.getElementById('nome').value = cliente.nome || '';
+            document.getElementById('doc').value = cliente.doc || '';
+            document.getElementById('endereco').value = cliente.endereco || '';
+            document.getElementById('cidade').value = cliente.cidade || '';
+            document.getElementById('telefone').value = cliente.telefone || '';
+            document.getElementById('email').value = cliente.email || '';
+        } else {
+            modalTitle.textContent = 'Adicionar Novo Cliente';
+            form.action = "{{ url_for('adicionar_cliente') }}";
+        }
+        
+        modal.style.display = 'block';
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+    
+    // É crucial chamar isso após o DOM estar pronto.
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+</script>
+{% endblock %}
