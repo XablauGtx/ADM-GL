@@ -61,20 +61,13 @@ def login_and_db_required(f):
 def login():
     if 'user' in session:
         return redirect(url_for('dashboard'))
-
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
         rest_api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_WEB_API_KEY}"
-        payload = json.dumps({
-            "email": email,
-            "password": password,
-            "returnSecureToken": True
-        })
-        headers = {"Content-Type": "application/json"}
-
+        payload = json.dumps({"email": email, "password": password, "returnSecureToken": True})
         try:
-            r = requests.post(rest_api_url, data=payload, headers=headers)
+            r = requests.post(rest_api_url, data=payload)
             r.raise_for_status()
             data = r.json()
             if 'idToken' in data:
@@ -82,11 +75,9 @@ def login():
                 session['idToken'] = data['idToken']
                 return redirect(url_for('dashboard'))
         except requests.exceptions.HTTPError:
-            print("Erro Firebase:", r.text)  # Mostra o erro real no console
             flash("Credenciais inválidas. Verifique o seu e-mail e senha.", "error")
         except Exception as e:
             flash(f"Ocorreu um erro de conexão: {e}", "error")
-
     return render_template("login.html")
 
 @app.route("/logout")
@@ -95,13 +86,6 @@ def logout():
     session.pop('idToken', None)
     flash("Você saiu da sua conta.", "success")
     return redirect(url_for('login'))
-
-# Exemplo de rota protegida
-@app.route("/dashboard")
-@login_and_db_required
-def dashboard():
-    return f"Bem-vindo, {session['user']}!"
-
 
 # ================================================================
 # --- SEÇÃO 2: PÁGINAS PRINCIPAIS (DASHBOARD, CONFIGURAÇÕES) ---
