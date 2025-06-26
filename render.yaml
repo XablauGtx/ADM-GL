@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: painel-flask
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    envVars:
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: firebase-credentials.json
+    autoDeploy: true
