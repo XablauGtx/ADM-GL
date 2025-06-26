@@ -1,5 +1,6 @@
 import io
 import json
+import os  # <-- adicionado
 import re
 import csv
 from datetime import date, datetime, timezone
@@ -7,20 +8,20 @@ from functools import wraps
 
 import firebase_admin
 import requests
-# A importação do 'Document' do python-docx já não é necessária
 from firebase_admin import credentials, firestore
 from flask import (Flask, Response, flash, redirect, render_template, request,
                    send_file, session, url_for)
 
 # --- INICIALIZAÇÃO DO FIREBASE ---
 try:
-    cred = credentials.Certificate("firebase-credentials.json")
+    firebase_config = json.loads(os.environ["FIREBASE_CREDENTIALS"])  # <-- novo
+    cred = credentials.Certificate(firebase_config)                    # <-- novo
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 except Exception as e:
     print(f"ERRO CRÍTICO AO INICIALIZAR O FIREBASE: {e}")
-    print("Verifique se o ficheiro 'firebase-credentials.json' está na pasta raiz e é válido.")
     db = None
+
 
 # --- CONFIGURAÇÃO DO APP FLASK ---
 app = Flask(__name__)
