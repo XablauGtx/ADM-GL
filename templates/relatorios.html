@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}Relatórios Financeiros{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Relatórios Financeiros</h1>
+    <p>Análise financeira das suas Ordens de Serviço por status.</p>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<h3 class="form-title">Valores Totais por Status</h3>
+<div class="stats-grid" style="margin-top: 1.5rem;">
+    <div class="stat-card">
+        <div class="card-icon green">
+            <i data-feather="check-circle"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor Concluído ({{ relatorio.count_concluido }} OS)</h4>
+            <p>R$ {{ "%.2f"|format(relatorio.total_concluido) }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon blue">
+            <i data-feather="loader"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor em Aberto ({{ relatorio.count_aberto }} OS)</h4>
+            <p>R$ {{ "%.2f"|format(relatorio.total_aberto) }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon" style="background-color: #ffcccc; color: #ff4d4d;">
+            <i data-feather="x-circle"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor Cancelado ({{ relatorio.count_cancelado }} OS)</h4>
+            <p>R$ {{ "%.2f"|format(relatorio.total_cancelado) }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

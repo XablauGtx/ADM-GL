@@ -10,6 +10,8 @@
 
 <div class="form-container">
     <form method="POST">
+        <input type="hidden" name="orcamento_horas" value="{{ dados_calculadora.horas or '' }}">
+        <input type="hidden" name="orcamento_valor_hora" value="{{ dados_calculadora.valor_hora or '' }}">
         <!-- DADOS DO CLIENTE -->
         <h3 class="form-title">Dados do Cliente</h3>
         <div class="form-grid">
@@ -53,32 +55,34 @@
         <div class="form-grid full-width">
             <div class="form-group full-width">
                 <label>Título do Serviço</label>
-                <input type="text" name="servico_titulo" required>
+                <input type="text" name="servico_titulo" required value="{{ dados_calculadora.titulo or '' }}">
             </div>
-             <div class="form-group full-width">
-                <label>Detalhes do Projeto</label>
+            <div class="form-group full-width">
+                <label>Detalhes do Projeto (Requisitos do cliente)</label>
                 <textarea name="servico_detalhes" rows="3"></textarea>
             </div>
             <div class="form-group full-width">
                 <label>Escopo e Entregáveis</label>
-                <textarea name="servico_escopo" rows="4"></textarea>
+                <textarea name="servico_escopo" rows="4">{{ dados_calculadora.escopo or '' }}</textarea>
             </div>
              <div class="form-group full-width">
                 <label>Garantia e Observações</label>
                 <textarea name="servico_garantia" rows="2"></textarea>
             </div>
         </div>
+        
         <h3 class="form-title" style="margin-top: 2rem;">Orçamento</h3>
         <div class="form-grid">
             <div class="form-group">
                 <label>Valor dos Serviços (R$)</label>
-                <input type="number" step="0.01" name="orcamento_servicos" value="0.00" required>
+                <input type="number" step="0.01" name="orcamento_servicos" value="{{ dados_calculadora.valor or '0.00' }}" required>
             </div>
             <div class="form-group">
-                <label>Valor de Produtos/Plugins (R$)</label>
+                <label>Valor de Peças/Produtos/Plugins (R$)</label>
                 <input type="number" step="0.01" name="orcamento_produtos" value="0.00" required>
             </div>
         </div>
+        
         
         <button type="submit" class="btn-salvar" style="width: 100%; margin-top: 2rem;">
             <i data-feather="save"></i>

@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}Agenda de Serviços{% endblock %}
+
+{% block content %}
+<header class="main-header">
+    <h1>Agenda de Serviços</h1>
+    <p>Organize os seus próximos compromissos e prazos.</p>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="agenda-layout">
+    <!-- Coluna do Formulário -->
+    <div class="form-container">
+        <h3 class="form-title">Novo Agendamento</h3>
+        <form method="POST">
+            <div class="form-group">
+                <label for="titulo">Título do Evento</label>
+                <input type="text" name="titulo" id="titulo" placeholder="Ex: Reunião de Kickoff" required>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="data_evento">Data</label>
+                    <input type="date" name="data_evento" id="data_evento" required>
+                </div>
+                <div class="form-group">
+                    <label for="hora_evento">Hora</label>
+                    <input type="time" name="hora_evento" id="hora_evento" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="cliente_id">Associar a um Cliente (Opcional)</label>
+                <select name="cliente_id" id="cliente_id">
+                    <option value="">-- Nenhum cliente --</option>
+                    {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição / Notas</label>
+                <textarea name="descricao" id="descricao" rows="4" placeholder="Adicione detalhes, links ou pautas da reunião..."></textarea>
+            </div>
+            <button type="submit" class="btn-salvar" style="width: 100%;">
+                <i data-feather="plus"></i> Adicionar à Agenda
+            </button>
+        </form>
+    </div>
+
+    <!-- Coluna da Lista de Agendamentos -->
+    <div class="agenda-list-container">
+        <h3 class="form-title">Próximos Compromissos</h3>
+        <div class="agenda-list">
+            {% for agendamento in agendamentos %}
+                <div class="agenda-item">
+                    <div class="agenda-date">
+                        <span>{{ agendamento.data_evento.strftime('%d') }}</span>
+                        <small>{{ agendamento.data_evento.strftime('%b') }}</small>
+                    </div>
+                    <div class="agenda-details">
+                        <h4>{{ agendamento.titulo }}</h4>
+                        <p>
+                            <i data-feather="clock" class="icon-sm"></i> {{ agendamento.hora_fmt }}
+                            {% if agendamento.cliente_nome %}
+                                <span class="separator">|</span> <i data-feather="user" class="icon-sm"></i> {{ agendamento.cliente_nome }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="agenda-actions">
+                        <form method="POST" action="{{ url_for('excluir_agendamento', agendamento_id=agendamento.id) }}" onsubmit="return confirm('Tem a certeza que deseja excluir este agendamento?');">
+                            <button type="submit" class="remove-task-btn">
+                                <i data-feather="trash-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--color-gray); padding: 2rem;">Não há compromissos futuros agendados.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

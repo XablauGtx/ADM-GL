@@ -5,8 +5,67 @@
 {% block content %}
 <header class="main-header">
     <h1>Ordens de Serviço</h1>
-    <p>Visualize e gerencie todas as O.S. registradas.</p>
+    <p>Visualize, filtre e gerencie todas as O.S. registadas.</p>
 </header>
+
+<!-- Formulário de Filtros -->
+<div class="filter-container">
+    <form method="GET" action="{{ url_for('ordens_servico_page') }}">
+        <div class="filter-group">
+            <label for="filtro_cliente">Filtrar por Cliente</label>
+            <input type="text" id="filtro_cliente" name="filtro_cliente" placeholder="Nome exato do cliente" value="{{ filtros.cliente or '' }}">
+        </div>
+        <div class="filter-group">
+            <label for="filtro_status">Filtrar por Status</label>
+            <select id="filtro_status" name="filtro_status">
+                <option value="">Todos os Status</option>
+                <option value="Aberta" {% if filtros.status == 'Aberta' %}selected{% endif %}>Aberta</option>
+                <option value="Em Andamento" {% if filtros.status == 'Em Andamento' %}selected{% endif %}>Em Andamento</option>
+                <option value="Concluída" {% if filtros.status == 'Concluída' %}selected{% endif %}>Concluída</option>
+                <option value="Cancelada" {% if filtros.status == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <a href="{{ url_for('ordens_servico_page') }}" class="btn-limpar">Limpar</a>
+            <button type="submit" class="btn-buscar">Filtrar</button>
+            <a id="export-btn" href="#" class="btn-export">
+                <i data-feather="download"></i> Exportar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Cartões de Relatório -->
+<h3 class="form-title">Resumo Financeiro (Filtros Aplicados)</h3>
+<div class="stats-grid" style="margin-top: 1.5rem; margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="card-icon green">
+            <i data-feather="check-circle"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor Concluído ({{ relatorio.count_concluido }} OS)</h4>
+            <p>R$ {{ "%.2f"|format(relatorio.total_concluido) }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon blue">
+            <i data-feather="loader"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor em Aberto ({{ relatorio.count_aberto }} OS)</h4>
+            <p>R$ {{ "%.2f"|format(relatorio.total_aberto) }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon" style="background-color: #ffcccc; color: #ff4d4d;">
+            <i data-feather="x-circle"></i>
+        </div>
+        <div class="card-info">
+            <h4>Valor Cancelado ({{ relatorio.count_cancelado }} OS)</h4>
+            <p>R$ {{ "%.2f"|format(relatorio.total_cancelado) }}</p>
+        </div>
+    </div>
+</div>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -16,6 +75,7 @@
     {% endif %}
 {% endwith %}
 
+<!-- Tabela de Ordens de Serviço -->
 <div class="table-container">
     <table>
         <thead>
@@ -37,26 +97,57 @@
                 <td>{{ os.servico_titulo | truncate(40) }}</td>
                 <td>
                     <form class="status-form" method="POST" action="{{ url_for('atualizar_status_os', os_id=os.id) }}">
-                        <select name="novo_status" class="status-select status-{{ os.status | lower }}" onchange="this.form.submit()">
+                        <select name="novo_status" class="status-select status-{{ os.status|lower|replace(' ', '-') }}" onchange="this.form.submit()">
                             <option value="Aberta" {% if os.status == 'Aberta' %}selected{% endif %}>Aberta</option>
                             <option value="Em Andamento" {% if os.status == 'Em Andamento' %}selected{% endif %}>Em Andamento</option>
                             <option value="Concluída" {% if os.status == 'Concluída' %}selected{% endif %}>Concluída</option>
                             <option value="Cancelada" {% if os.status == 'Cancelada' %}selected{% endif %}>Cancelada</option>
                         </select>
                     </form>
-                </td>                
+                </td>
                 <td>
-                    <a href="{{ url_for('visualizar_os_page', os_id=os.id) }}" class="action-btn view">
+                    <a href="{{ url_for('gerenciar_os_page', os_id=os.id) }}" class="action-btn view">
                         <i data-feather="eye"></i> Visualizar
                     </a>
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="6">Nenhuma Ordem de Serviço encontrada.</td>
+                <td colspan="6">Nenhuma Ordem de Serviço encontrada com os filtros aplicados.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function atualizarLinkExportacao() {
+        const cliente = document.getElementById('filtro_cliente').value;
+        const status = document.getElementById('filtro_status').value;
+        const exportBtn = document.getElementById('export-btn');
+        
+        let baseUrl = "{{ url_for('exportar_csv') }}";
+        let params = new URLSearchParams();
+        
+        if (cliente) {
+            params.append('filtro_cliente', cliente);
+        }
+        if (status) {
+            params.append('filtro_status', status);
+        }
+        
+        exportBtn.href = `${baseUrl}?${params.toString()}`;
+    }
+
+    // Atualiza o link ao carregar a página
+    atualizarLinkExportacao();
+
+    // Atualiza o link sempre que um filtro for alterado
+    document.getElementById('filtro_cliente').addEventListener('keyup', atualizarLinkExportacao);
+    document.getElementById('filtro_status').addEventListener('change', atualizarLinkExportacao);
+});
+</script>
 {% endblock %}

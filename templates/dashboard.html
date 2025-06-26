@@ -5,50 +5,50 @@
 {% block content %}
 <header class="main-header">
     <h1>Dashboard</h1>
-    <p>Visão geral da sua atividade.</p>
+    <p>Visão geral da sua atividade de negócio.</p>
 </header>
 
 <!-- Grid de Estatísticas Atualizado -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="card-icon purple">
-            <i data-feather="clipboard"></i>
-        </div>
-        <div class="card-info">
-            <h4>O.S. (Total)</h4>
-            <p>{{ stats.total_os }}</p>
-        </div>
-    </div>
-    <div class="stat-card">
         <div class="card-icon green">
             <i data-feather="dollar-sign"></i>
         </div>
         <div class="card-info">
-            <h4>Valor Gerado (Total)</h4>
-            <p>R$ {{ "%.2f"|format(stats.valor_total_gerado) }}</p>
+            <h4>Faturado (Mês Atual)</h4>
+            <p>R$ {{ "%.2f"|format(stats.valor_concluido_mes) }}</p>
         </div>
     </div>
     <div class="stat-card">
         <div class="card-icon blue">
-            <i data-feather="calendar"></i>
+            <i data-feather="check-circle"></i>
         </div>
         <div class="card-info">
-            <h4>O.S. (Mês Atual)</h4>
-            <p>{{ stats.os_este_mes }}</p>
+            <h4>O.S. Concluídas (Mês)</h4>
+            <p>{{ stats.count_concluido_mes }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="card-icon purple">
+            <i data-feather="trending-up"></i>
+        </div>
+        <div class="card-info">
+            <h4>Faturado (Total)</h4>
+            <p>R$ {{ "%.2f"|format(stats.valor_concluido_total) }}</p>
         </div>
     </div>
     <div class="stat-card">
         <div class="card-icon orange">
-            <i data-feather="trending-up"></i>
+            <i data-feather="loader"></i>
         </div>
         <div class="card-info">
-            <h4>Valor (Mês Atual)</h4>
-            <p>R$ {{ "%.2f"|format(stats.valor_este_mes) }}</p>
+            <h4>O.S. em Aberto</h4>
+            <p>{{ stats.count_aberto_total }}</p>
         </div>
     </div>
 </div>
 
-<!-- Seção de OS Recentes -->
+<!-- Secção de OS Recentes (continua igual) -->
 <div class="recent-contracts-container">
     <div class="recent-header">
         <h2>Ordens de Serviço Recentes</h2>
@@ -60,7 +60,7 @@
                 <tr>
                     <th>Cliente</th>
                     <th>Serviço</th>
-                    <th>Valor Total</th>
+                    <th>Status</th>
                     <th>Data</th>
                     <th>Ações</th>
                 </tr>
@@ -70,10 +70,12 @@
                 <tr>
                     <td>{{ os.cliente_nome }}</td>
                     <td>{{ os.servico_titulo | truncate(40) }}</td>
-                    <td>R$ {{ "%.2f"|format(os.orcamento_servicos + os.orcamento_produtos) }}</td>
+                    <td>
+                        <span class="status-badge status-{{ os.status|lower|replace(' ', '-') }}">{{ os.status }}</span>
+                    </td>
                     <td>{{ os.data_abertura_fmt }}</td>
                     <td>
-                        <a href="{{ url_for('visualizar_os_page', os_id=os.id) }}" class="action-btn-sm view">
+                        <a href="{{ url_for('gerenciar_os_page', os_id=os.id) }}" class="action-btn-sm view">
                             <i data-feather="eye"></i>
                         </a>
                     </td>

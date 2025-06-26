@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerir OS {{ os.id[:8] }} - {{ os.cliente_nome }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='os_style.css') }}">
+</head>
+<body>
+    <div class="os-container">
+        <!-- Barra de Ações Internas -->
+        <div class="os-actions-bar no-print">
+            <a href="{{ url_for('ordens_servico_page') }}" class="action-button back-btn"><i data-feather="arrow-left"></i> Voltar</a>
+            <button onclick="window.print()" class="action-button print-btn"><i data-feather="printer"></i> Imprimir Gestão</button>
+            <a href="{{ url_for('os_cliente_page', os_id=os.id) }}" target="_blank" class="action-button client-view-btn">
+                <i data-feather="user"></i> Ver Versão do Cliente
+            </a>
+        </div>
+
+        <header class="os-header">
+            <div class="company-info">
+                <h1>{{ empresa.nome_empresa or 'Sua Empresa' }}</h1>
+                <p>CNPJ: {{ empresa.cnpj or 'Não configurado' }}</p>
+            </div>
+            <div class="os-details-box">
+                <h2>REGISTO DE ORDEM DE SERVIÇO</h2>
+                <p><strong>O.S. Nº:</strong> {{ os.id[:8] }}</p>
+                <p><strong>Data de abertura:</strong> {{ os.data_abertura_fmt }}</p>
+            </div>
+        </header>
+
+        <section class="os-section">
+            <h3 class="section-title">DADOS DO CLIENTE</h3>
+            <table class="info-table">
+                <tr><td><strong>Nome:</strong> {{ os.cliente_nome }}</td><td><strong>CPF/CNPJ:</strong> {{ os.cliente_doc }}</td></tr>
+                <tr><td><strong>Endereço:</strong> {{ os.cliente_endereco }}</td><td><strong>Cidade:</strong> {{ os.cliente_cidade }}</td></tr>
+                <tr><td><strong>Telefone:</strong> {{ os.cliente_telefone }}</td><td><strong>E-mail:</strong> {{ os.cliente_email }}</td></tr>
+            </table>
+        </section>
+
+        <!-- SECÇÃO DE CONTROLO FINANCEIRO -->
+        <section class="os-section">
+            <div class="section-header">
+                <h3 class="section-title">CONTROLO FINANCEIRO</h3>
+                <button class="action-button add-payment-btn no-print" onclick="openPaymentModal()">
+                    <i data-feather="plus-circle"></i> Adicionar Pagamento
+                </button>
+            </div>
+            <div class="financial-summary">
+                <div class="summary-box"><span>Valor Total</span><strong>R$ {{ "%.2f"|format(financeiro.valor_total) }}</strong></div>
+                <div class="summary-box"><span>Total Pago</span><strong>R$ {{ "%.2f"|format(financeiro.total_pago) }}</strong></div>
+                <div class="summary-box saldo-devedor"><span>Saldo Devedor</span><strong>R$ {{ "%.2f"|format(financeiro.saldo_devedor) }}</strong></div>
+                <div class="summary-box status"><span class="payment-status status-{{ financeiro.status | lower | replace(' ', '-') }}">{{ financeiro.status }}</span></div>
+            </div>
+            <h4 class="history-title">Histórico de Pagamentos</h4>
+            <table class="history-table">
+                <thead><tr><th>Data</th><th>Método</th><th>Valor Pago</th></tr></thead>
+                <tbody>
+                    {% for pag in financeiro.historico %}
+                    <tr><td>{{ pag.data_fmt }}</td><td>{{ pag.metodo }}</td><td>R$ {{ "%.2f"|format(pag.valor) }}</td></tr>
+                    {% else %}
+                    <tr><td colspan="3">Nenhum pagamento registado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+       
+        <!-- NOVA SECÇÃO: HISTÓRICO DE COMUNICAÇÃO -->
+<section class="os-section">
+    <h3 class="section-title">HISTÓRICO DE COMUNICAÇÃO / MURAL DO PROJETO</h3>
+    <div class="comment-form-container no-print">
+        <form method="POST" action="{{ url_for('adicionar_comentario', os_id=os.id) }}">
+            <textarea name="texto_comentario" rows="3" placeholder="Adicione uma nova atualização sobre o projeto..."></textarea>
+            <button type="submit" class="action-button add-payment-btn">
+                <i data-feather="message-square"></i> Adicionar Nota
+            </button>
+        </form>
+    </div>
+
+    <div class="comment-history">
+        {% for comentario in comentarios %}
+        <div class="comment-item">
+            <div class="comment-bubble">
+                <p>{{ comentario.texto | replace('\n', '<br>') | safe }}</p>
+            </div>
+            <div class="comment-meta">
+                <span>Por <strong>{{ comentario.autor }}</strong> em {{ comentario.data_fmt }}</span>
+            </div>
+        </div>
+        {% else %}
+        <p style="padding: 20px; text-align: center; color: #888;">Nenhum comentário adicionado a esta O.S.</p>
+        {% endfor %}
+    </div>
+</section>
+
+        <footer class="os-footer">
+            <div class="signature-line"><p>___________________________________</p><p>Assinatura Cliente</p></div>
+            <div class="signature-line"><p>___________________________________</p><p>{{ empresa.nome_empresa or 'Sua Empresa' }}</p></div>
+        </footer>
+    </div>
+
+    <!-- MODAL DE PAGAMENTO (ADICIONADO DE VOLTA) -->
+    <div id="payment-modal" class="modal no-print">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registar Novo Pagamento</h3>
+                <span class="close-button" onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('adicionar_pagamento', os_id=os.id) }}">
+                    <div class="form-group">
+                        <label>Valor Pago (R$)</label>
+                        <input type="number" name="valor_pago" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Método de Pagamento</label>
+                        <select name="metodo_pagamento">
+                            <option>PIX</option><option>Transferência Bancária</option><option>Cartão de Crédito</option><option>Dinheiro</option><option>Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data do Pagamento</label>
+                        <input type="date" name="data_pagamento" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" onclick="closePaymentModal()">Cancelar</button>
+                        <button type="submit" class="btn-salvar">Salvar Pagamento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script>
+    feather.replace();
+    
+    const modal = document.getElementById('payment-modal');
+
+    function openPaymentModal() {
+        // Põe a data de hoje por defeito
+        document.querySelector('input[name="data_pagamento"]').valueAsDate = new Date();
+        modal.style.display = 'block';
+    }
+
+    function closePaymentModal() {
+        modal.style.display = 'none';
+    }
+</script>
+</body>
+</html>

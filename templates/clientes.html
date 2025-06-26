@@ -3,85 +3,24 @@
 {% block title %}Carteira de Clientes{% endblock %}
 
 {% block content %}
-<!-- Adicionando os estilos do Modal e dos botões para garantir que funcionem -->
 <style>
     /* Estilos do Modal */
-    .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 1000; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.5); 
-        animation: fadeIn 0.3s;
-    }
-    .modal-content {
-        background-color: #fefefe;
-        margin: 10vh auto; 
-        padding: 2rem;
-        border: 1px solid #888;
-        width: 90%;
-        max-width: 700px;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    }
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    .modal-header h3 {
-        margin: 0;
-        font-size: 1.5rem;
-    }
-    .close-button {
-        color: #aaa;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .close-button:hover, .close-button:focus {
-        color: black;
-    }
-    @keyframes fadeIn {
-        from {opacity: 0; transform: translateY(-20px);}
-        to {opacity: 1; transform: translateY(0);}
-    }
-
-    /* Estilos para o Botão "Adicionar Cliente" (CORRIGIDO) */
-    .view-all-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        border: none;
-        cursor: pointer;
-    }
-    
-    /* Estilos para os botões de Ação na tabela (CORRIGIDO) */
-    .actions-cell .action-btn-sm {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-    }
-    .actions-cell .action-btn-sm i {
-        width: 16px;
-        height: 16px;
-    }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s; }
+    .modal-content { background-color: #fefefe; margin: 10vh auto; padding: 2rem; border: 1px solid #888; width: 90%; max-width: 700px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    .modal-header h3 { margin: 0; font-size: 1.5rem; }
+    .close-button { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close-button:hover, .close-button:focus { color: black; }
+    @keyframes fadeIn { from {opacity: 0; transform: translateY(-20px);} to {opacity: 1; transform: translateY(0);} }
+    .view-all-btn { display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; }
+    .actions-cell .action-btn-sm { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; }
+    .actions-cell .action-btn-sm i { width: 16px; height: 16px; }
 </style>
 
 <header class="main-header">
     <h1>Carteira de Clientes</h1>
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <p>Gerencie todos os seus clientes em um único lugar.</p>
+        <p>Gerencie todos os seus clientes num único lugar.</p>
         <button class="view-all-btn" onclick="openModal()">
             <i data-feather="plus"></i> Adicionar Cliente
         </button>
@@ -103,7 +42,7 @@
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Telefone</th>
-                <th style="width: 150px;">Ações</th>
+                <th style="width: 200px;">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -113,12 +52,20 @@
                 <td>{{ cliente.email }}</td>
                 <td>{{ cliente.telefone }}</td>
                 <td class="actions-cell">
+                    <!-- NOVO: BOTÃO WHATSAPP -->
+                    {% if cliente.telefone %}
+                    <a href="https://wa.me/{{ cliente.telefone | format_whatsapp }}" target="_blank" class="action-btn-sm whatsapp">
+                        <i data-feather="message-circle"></i>
+                    </a>
+                    {% endif %}
+
                     <button class="action-btn-sm edit" 
                             data-cliente='{{ cliente | tojson | safe }}' 
                             onclick="openModal(this)">
                         <i data-feather="edit-2"></i>
                     </button>
-                    <form method="POST" action="{{ url_for('excluir_cliente', cliente_id=cliente.id) }}" onsubmit="return confirm('Tem certeza que deseja excluir este cliente?');">
+
+                    <form method="POST" action="{{ url_for('excluir_cliente', cliente_id=cliente.id) }}" onsubmit="return confirm('Tem a certeza que deseja excluir este cliente?');">
                         <button type="submit" class="action-btn-sm delete">
                             <i data-feather="trash-2"></i>
                         </button>
@@ -145,30 +92,12 @@
             <form id="client-form" method="POST">
                 <input type="hidden" name="cliente_id" id="cliente_id">
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nome Completo</label>
-                        <input type="text" name="nome" id="nome" required>
-                    </div>
-                    <div class="form-group">
-                        <label>CPF/CNPJ</label>
-                        <input type="text" name="doc" id="doc">
-                    </div>
-                    <div class="form-group">
-                        <label>Endereço</label>
-                        <input type="text" name="endereco" id="endereco">
-                    </div>
-                    <div class="form-group">
-                        <label>Cidade</label>
-                        <input type="text" name="cidade" id="cidade">
-                    </div>
-                    <div class="form-group">
-                        <label>Telefone</label>
-                        <input type="text" name="telefone" id="telefone">
-                    </div>
-                    <div class="form-group">
-                        <label>E-mail</label>
-                        <input type="email" name="email" id="email">
-                    </div>
+                    <div class="form-group"><label>Nome Completo</label><input type="text" name="nome" id="nome" required></div>
+                    <div class="form-group"><label>CPF/CNPJ</label><input type="text" name="doc" id="doc"></div>
+                    <div class="form-group"><label>Endereço</label><input type="text" name="endereco" id="endereco"></div>
+                    <div class="form-group"><label>Cidade</label><input type="text" name="cidade" id="cidade"></div>
+                    <div class="form-group"><label>Telefone</label><input type="text" name="telefone" id="telefone"></div>
+                    <div class="form-group"><label>E-mail</label><input type="email" name="email" id="email"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-cancelar" onclick="closeModal()">Cancelar</button>
@@ -219,7 +148,6 @@
         }
     }
     
-    // É crucial chamar isso após o DOM estar pronto.
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof feather !== 'undefined') {
             feather.replace();

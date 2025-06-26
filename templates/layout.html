@@ -13,51 +13,78 @@
 </head>
 <body>
     <div class="app-layout">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <i data-feather="hexagon"></i>
                 <h2>GL Technology</h2>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="{{ 'active' if active_page == 'dashboard' else '' }}">
-                        <a href="{{ url_for('dashboard') }}"><i data-feather="home"></i><span>Dashboard</span></a>
-                    </li>
-                    <li class="{{ 'active' if active_page == 'clientes' else '' }}">
-                        <a href="{{ url_for('clientes_page') }}"><i data-feather="users"></i><span>Clientes</span></a>
-                    </li>
-                    <li class="{{ 'active' if active_page == 'gerar_os' else '' }}">
-                        <a href="{{ url_for('gerar_os_page') }}"><i data-feather="file-plus"></i><span>Nova O.S.</span></a>
-                    </li>
-                    <li class="{{ 'active' if active_page == 'ordens_servico' else '' }}">
-                        <a href="{{ url_for('ordens_servico_page') }}"><i data-feather="clipboard"></i><span>Ordens de Serviço</span></a>
-                    </li>
-                    <li class="{{ 'active' if active_page == 'configuracoes' else '' }}">
-                        <a href="{{ url_for('configuracoes_page') }}"><i data-feather="settings"></i><span>Configurações</span></a>
-                    </li>
+                    <li class="{{ 'active' if active_page == 'dashboard' else '' }}"><a href="{{ url_for('dashboard') }}"><i data-feather="home"></i><span>Dashboard</span></a></li>
+                    <li class="{{ 'active' if active_page == 'agenda' else '' }}"><a href="{{ url_for('agenda_page') }}"><i data-feather="calendar"></i><span>Agenda</span></a></li>
+                    <li class="{{ 'active' if active_page == 'clientes' else '' }}"><a href="{{ url_for('clientes_page') }}"><i data-feather="users"></i><span>Clientes</span></a></li>
+                    <li class="{{ 'active' if active_page == 'gerar_os' else '' }}"><a href="{{ url_for('gerar_os_page') }}"><i data-feather="file-plus"></i><span>Nova O.S.</span></a></li>
+                    <li class="{{ 'active' if active_page == 'ordens_servico' else '' }}"><a href="{{ url_for('ordens_servico_page') }}"><i data-feather="clipboard"></i><span>Ordens de Serviço</span></a></li>
+                    <li class="{{ 'active' if active_page == 'calculadora' else '' }}"><a href="{{ url_for('calculadora_page') }}"><i data-feather="cpu"></i><span>Calculadora</span></a></li>
+                    <li class="{{ 'active' if active_page == 'configuracoes' else '' }}"><a href="{{ url_for('configuracoes_page') }}"><i data-feather="settings"></i><span>Configurações</span></a></li>
                 </ul>
-                <ul>
-                </ul>
-            <ul style="margin-top: auto;">
-               <li>
-                   <a href="{{ url_for('logout') }}"><i data-feather="log-out"></i><span>Sair</span></a>
-               </li>
-            </ul>
             </nav>
-            <div class="sidebar-footer">
-                <img src="https://i.imgur.com/T0f4Jxe.png" alt="Illustration">
-                <h4>Área Segura</h4>
-                <p>Seus dados estão protegidos.</p>
+            
+            <div class="theme-switcher-container">
+                <div class="theme-switcher">
+                    <span>Modo Escuro</span>
+                    <label class="switch"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label>
+                </div>
             </div>
+
+            <nav class="sidebar-nav" style="margin-top: 0; padding-bottom: 1rem;">
+                 <ul>
+                    <li><a href="{{ url_for('logout') }}"><i data-feather="log-out"></i><span>Sair</span></a></li>
+                 </ul>
+            </nav>
         </aside>
 
         <main class="main-content">
+            <header class="mobile-header">
+                <button class="hamburger-btn" id="hamburger-btn">
+                    <i data-feather="menu"></i>
+                </button>
+                <span>GL Technology</span>
+            </header>
+            
             {% block content %}{% endblock %}
         </main>
     </div>
 
     <script>
-      feather.replace()
+        feather.replace()
     </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Script do Modo Escuro
+            const themeToggle = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme) {
+                document.body.classList.add(currentTheme);
+                if (currentTheme === 'dark-theme') themeToggle.checked = true;
+            }
+            themeToggle.addEventListener('change', function () {
+                document.body.classList.toggle('dark-theme');
+                let theme = document.body.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
+                localStorage.setItem('theme', theme);
+            });
+
+            // Script do Menu Responsivo
+            const sidebar = document.getElementById('sidebar');
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            hamburgerBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('is-open');
+            });
+        });
+    </script>
+    
+    <!-- Bloco para scripts específicos de cada página -->
+    {% block scripts %}{% endblock %}
 </body>
 </html>
